@@ -1,12 +1,14 @@
 import axios from "axios"
 import { DynamicDataTableProps, ColDef, DynamicDataTableResult } from "../types/DynamicDataTable";
 import DynamicDataTable from "../components/DynamicDataTable";
-import { Button, HStack, Image, Link, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger, Text, VStack } from "@chakra-ui/react";
+import { Button, Card, Flex, HStack, Image, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger, Text, VStack } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
+import { IoBeer } from "react-icons/io5";
+import moment from "moment";
 
 const Demo = () => {
 
-  const tableRequest = async ({skipCount, pageSize}:DynamicDataTableProps, callback: (data:DynamicDataTableResult)=>Promise<any>) => {
+  const tableSpaceFlightNewsRequest = async ({skipCount, pageSize}:DynamicDataTableProps, callback: (data:DynamicDataTableResult)=>Promise<any>) => {
     const options = {
       method: 'GET',
       url: `https://api.spaceflightnewsapi.net/v4/articles/?limit=${pageSize}&offset=${skipCount}`,
@@ -22,12 +24,34 @@ const Demo = () => {
       totalCount: response.data.count
     })
   }
+  const tableBreweriesRequest = async ({skipCount, pageSize}:DynamicDataTableProps, callback: (data:DynamicDataTableResult)=>Promise<any>) => {
+      var options = null;
+      options = {
+        method: 'GET',
+        url: `https://api.openbrewerydb.org/v1/breweries`,
+        headers: {
+          'accept': 'application/json',
+        }
+      };
+    
+    const response = await axios.request(options);
+    
+    const totalLength = response.data.length;
+    if(skipCount!==undefined && pageSize!==undefined){
+      response.data = response.data.slice(skipCount, skipCount + pageSize)
+    }
+
+    callback({
+      items: response.data,
+      totalCount: totalLength
+    })
+  }
 
   const openInNewTab = (url:string) => {
     window.open(url, "_blank", "noreferrer");
   };
 
-  const colDefs: Array<ColDef> = [
+  const colSpaceFlightNewsDefs: Array<ColDef> = [
     {
       title: "Title",
       render: (item: any) => {
@@ -43,7 +67,7 @@ const Demo = () => {
               <PopoverContent>
                 <PopoverArrow />
                 <PopoverCloseButton />
-                <PopoverHeader>{item.published_at}</PopoverHeader>
+                <PopoverHeader>{moment(item.published_at).format("L LT")}</PopoverHeader>
                 <PopoverBody>
                   <VStack justifyContent={"start"} alignItems={"start"}>
                     <Text w="100%" fontSize='lg' textAlign={"left"} isTruncated>
@@ -69,7 +93,7 @@ const Demo = () => {
       title: "Last updated",
       width: "20%",
       render: (item: any) => {
-        return item.updated_at
+        return moment(item.published_at).format("L LT")
       }
     },
     {
@@ -85,8 +109,81 @@ const Demo = () => {
     }
   ]
 
+  
+  const colBreweriesDefs: Array<ColDef> = [
+    {
+      title: "Title",
+      render: (item: any) => {
+        return item.name;
+      }
+    },
+    {
+      title: "Country",
+      width: "20%",
+      render: (item: any) => {
+        return item.country
+      }
+    },
+    {
+      title: "City",
+      width: "20%",
+      render: (item: any) => {
+        return item.city
+      }
+    },
+    {
+      title: "Type",
+      width: "20%",
+      render: (item: any) => {
+        return item.brewery_type
+      }
+    },
+    {
+      title: "Phone",
+      width: "20%",
+      render: (item: any) => {
+        return item.phone
+      }
+    },
+    {
+      title: "Actions",
+      width: "20%",
+      render: (item: any) => {
+        return (
+          <Button colorScheme='orange' variant='outline' bgColor='white' onClick={()=>openInNewTab(item.website_url)}>
+            <HStack>
+              <IoBeer/>
+              <Text ml="2">
+                Website
+              </Text>
+            </HStack>
+          </Button>
+        )
+      }
+    }
+  ]
+
   return (
-    <DynamicDataTable request={tableRequest} pageSize={10} pagination={true}  colDefs={colDefs}/>
+    <VStack m='20'>
+      <Flex flexDirection='column' w={"100%"}>
+        <Text textAlign="left" fontSize='4xl'>Space Flight News</Text>
+        <Card w={"100%"}>
+          <DynamicDataTable request={tableSpaceFlightNewsRequest} pageSize={10} pagination={true}  colDefs={colSpaceFlightNewsDefs} variant='striped' colorScheme='blue'/>
+        </Card>
+      </Flex>
+      <Flex flexDirection='column' w={"100%"}>
+        <Text textAlign="left" w={"100%"} fontSize='4xl'>Space Flight News No Pagination</Text>
+        <Card w={"100%"}>
+          <DynamicDataTable request={tableSpaceFlightNewsRequest} pageSize={10} pagination={false}  colDefs={colSpaceFlightNewsDefs} variant='striped' colorScheme='blue'/>
+        </Card>
+      </Flex>
+      <Flex flexDirection='column' w={"100%"}>
+        <Text textAlign="left" w={"100%"} fontSize='4xl'>Breweries</Text>
+        <Card w={"100%"}>
+          <DynamicDataTable request={tableBreweriesRequest} pageSize={10} pagination={true}  colDefs={colBreweriesDefs} variant='striped' colorScheme='orange' />
+        </Card>
+      </Flex>
+    </VStack>
   )
 }
 
