@@ -17,6 +17,6 @@ export interface DynamicDataTableResult {
 
 export interface ColDef {
   title: string;
-  width: string;
+  width?: string;
   render: (item: any) => JSX.Element;
 }

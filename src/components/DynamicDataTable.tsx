@@ -87,6 +87,11 @@ const DynamicDataTable = ({ pagination, pageSize, colDefs, request, t }: Dynamic
                     {
                       colDefs.map((column) => {
                         return (
+                          column.width ?
+                          <Td w={column.width}>
+                            {column.render(item)}
+                          </Td>
+                          :
                           <Td>
                             {column.render(item)}
                           </Td>

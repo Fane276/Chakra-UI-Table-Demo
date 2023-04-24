@@ -1,36 +1,86 @@
 import axios from "axios"
 import { DynamicDataTableProps, ColDef, DynamicDataTableResult } from "../types/DynamicDataTable";
 import DynamicDataTable from "../components/DynamicDataTable";
+import { Button, HStack, Image, Link, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger, Text, VStack } from "@chakra-ui/react";
+import { FaEye } from "react-icons/fa";
 
 const Demo = () => {
 
   const tableRequest = async ({skipCount, pageSize}:DynamicDataTableProps, callback: (data:DynamicDataTableResult)=>Promise<any>) => {
     const options = {
       method: 'GET',
-      url: 'https://api-football-v1.p.rapidapi.com/v3/leagues',
+      url: `https://api.spaceflightnewsapi.net/v4/articles/?limit=${pageSize}&offset=${skipCount}`,
       headers: {
-        'content-type': 'application/octet-stream',
-        'X-RapidAPI-Key': 'f2958c3f15msh25a5bbad2521d01p17640fjsn40b32cc5ee30',
-        'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com'
+        'accept': 'application/json',
       }
     };
     
     const response = await axios.request(options);
 
-    response.data.response = response.data.response.slice(skipCount, skipCount + pageSize);
-
     callback({
-      items: response.data.response,
-      totalCount: response.data.results
+      items: response.data.results,
+      totalCount: response.data.count
     })
   }
 
+  const openInNewTab = (url:string) => {
+    window.open(url, "_blank", "noreferrer");
+  };
+
   const colDefs: Array<ColDef> = [
     {
-      title: "League",
+      title: "Title",
+      render: (item: any) => {
+        return (
+          <Popover>
+            <HStack>
+              <Text verticalAlign='baseline' isTruncated>
+                {item.title}
+              </Text>
+              <PopoverTrigger>
+                <Button variant='ghoast'><FaEye/></Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverHeader>{item.published_at}</PopoverHeader>
+                <PopoverBody>
+                  <VStack justifyContent={"start"} alignItems={"start"}>
+                    <Text w="100%" fontSize='lg' textAlign={"left"} isTruncated>
+                      {item.title}
+                    </Text>
+                    <Image src={item.image_url}/>
+                  </VStack>
+                </PopoverBody>
+              </PopoverContent>
+            </HStack>
+          </Popover>
+        )
+      }
+    },
+    {
+      title: "News Web Site",
       width: "20%",
       render: (item: any) => {
-        return item.league.name
+        return item.news_site
+      }
+    },
+    {
+      title: "Last updated",
+      width: "20%",
+      render: (item: any) => {
+        return item.updated_at
+      }
+    },
+    {
+      title: "Actions",
+      width: "20%",
+      render: (item: any) => {
+        return (
+          <Button colorScheme='blue' onClick={()=>openInNewTab(item.url)}>
+            Read More
+          </Button>
+        )
       }
     }
   ]
