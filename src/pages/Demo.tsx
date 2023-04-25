@@ -101,7 +101,7 @@ const Demo = () => {
       width: "20%",
       render: (item: any) => {
         return (
-          <Button colorScheme='blue' onClick={()=>openInNewTab(item.url)}>
+          <Button size='sm' onClick={()=>openInNewTab(item.url)}>
             Read More
           </Button>
         )
@@ -174,7 +174,7 @@ const Demo = () => {
       <Flex flexDirection='column' w={"100%"}>
         <Text textAlign="left" w={"100%"} fontSize='4xl'>Space Flight News No Pagination</Text>
         <Card w={"100%"}>
-          <DynamicDataTable request={tableSpaceFlightNewsRequest} pageSize={10} pagination={false}  colDefs={colSpaceFlightNewsDefs} variant='striped' colorScheme='blue'/>
+          <DynamicDataTable request={tableSpaceFlightNewsRequest} pageSize={10} pagination={false}  colDefs={colSpaceFlightNewsDefs} variant='striped' colorScheme="teal"/>
         </Card>
       </Flex>
       <Flex flexDirection='column' w={"100%"}>
