@@ -169,7 +169,7 @@ const Demo = () => {
 
 
   return (
-    <VStack m='20'>
+    <VStack m='20' mt="0" spacing='10'>
       <HStack w="100%" justifyContent='end'>
         <Button onClick={toggleColorMode} mt={6}>
           {colorMode === "dark" ? <BsSun/> : <BsMoonStars/>} 
