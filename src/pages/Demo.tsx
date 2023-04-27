@@ -1,9 +1,10 @@
 import axios from "axios"
 import { DynamicDataTableProps, ColDef, DynamicDataTableResult } from "../types/DynamicDataTable";
 import DynamicDataTable from "../components/DynamicDataTable";
-import { Button, Card, Flex, HStack, Image, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger, Text, VStack } from "@chakra-ui/react";
+import { Button, Card, Flex, HStack, Image, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger, Text, useColorMode, useColorModeValue, VStack } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
 import { IoBeer } from "react-icons/io5";
+import { BsSun, BsMoonStars } from 'react-icons/bs'
 import moment from "moment";
 
 const Demo = () => {
@@ -108,8 +109,9 @@ const Demo = () => {
       }
     }
   ]
-
   
+  
+  const btnBgColor = useColorModeValue("white", "gray.700");
   const colBreweriesDefs: Array<ColDef> = [
     {
       title: "Title",
@@ -150,7 +152,7 @@ const Demo = () => {
       width: "20%",
       render: (item: any) => {
         return (
-          <Button colorScheme='orange' variant='outline' bgColor='white' onClick={()=>openInNewTab(item.website_url)}>
+          <Button colorScheme='orange' variant='outline' bgColor={btnBgColor} onClick={()=>openInNewTab(item.website_url)}>
             <HStack>
               <IoBeer/>
               <Text ml="2">
@@ -161,10 +163,18 @@ const Demo = () => {
         )
       }
     }
-  ]
+  ];
+
+  const { colorMode, toggleColorMode } = useColorMode();
+
 
   return (
     <VStack m='20'>
+      <HStack w="100%" justifyContent='end'>
+        <Button onClick={toggleColorMode} mt={6}>
+          {colorMode === "dark" ? <BsSun/> : <BsMoonStars/>} 
+        </Button>
+      </HStack>
       <Flex flexDirection='column' w={"100%"}>
         <Text textAlign="left" fontSize='4xl'>Space Flight News</Text>
         <Card w={"100%"}>
